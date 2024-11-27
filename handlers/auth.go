@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"workout-tracker/models"
 	"workout-tracker/utils"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+const responseMessage = "Internal Server Error: failed to generate token"
 
 func SignUp(w http.ResponseWriter, req *http.Request) {
 	var user models.User
@@ -35,7 +38,14 @@ func Login(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	token, _ := utils.GenerateToken(user.ID)
+	token, err := utils.GenerateToken(user.ID)
+
+	if err != nil {
+		log.Printf("failed to generate token : %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(responseMessage))
+		return
+	}
 	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }
 
