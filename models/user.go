@@ -41,6 +41,7 @@ type Exercise struct {
 }
 
 type WorkoutPlan struct {
+	gorm.Model
 	Exercises []Exercise `json:"exercises"`
 }
 
