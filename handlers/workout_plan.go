@@ -2,52 +2,35 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
-	"workout-tracker/models"
+	"strconv"
 	"workout-tracker/services"
+
+	"github.com/gorilla/mux"
 )
 
-func CreateUser(userService services.UserService) http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		var user models.User
-		json.NewDecoder(req.Body).Decode(&user)
-		err := userService.CreateUser(&user)
+func GetUser(userService services.UserService) http.HandlerFunc {
 
-		w.Header().Set("Content-Type", "application/json")
+	return func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+
+		id := vars["id"]
+
+		userId, err := strconv.Atoi(id)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": "Failed to create user",
-			})
-			log.Printf("failed to create user : %s", err.Error())
+			writeErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, "+err.Error())
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "User created successfully",
-			"id":      fmt.Sprintf("%d", user.ID),
-		})
-		log.Printf("user created successfully with ID %d", user.ID)
+		user, err := userService.GetUser(uint(userId))
+		if err != nil {
+			writeErrorResponse(w, http.StatusNotFound, "User not found, "+err.Error())
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(user); err != nil {
+			writeErrorResponse(w, http.StatusInternalServerError, "Failed to encode user data "+err.Error())
+			return
+		}
+		writeSuccessUserResponse(w, http.StatusOK, user)
 	}
-}
-
-func GetUser(w http.ResponseWriter, req *http.Request) {
-	return
-}
-func UpdateUser(w http.ResponseWriter, req *http.Request) {
-	return
-}
-func DeleteUser(w http.ResponseWriter, req *http.Request) {
-
-}
-func AddWorkoutToUser(w http.ResponseWriter, req *http.Request) {
-	return
-}
-func GetUserWorkouts(w http.ResponseWriter, req *http.Request) {
-	return
-}
-func RemoveWorkoutFromUser(w http.ResponseWriter, req *http.Request) {
-	return
 }

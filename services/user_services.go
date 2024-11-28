@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"workout-tracker/models"
 
@@ -11,6 +12,7 @@ import (
 type UserService interface {
 	CreateUser(user *models.User) error
 	GetUser(id uint) (*models.User, error)
+	GetUserByUsername(username string) (*models.User, error)
 	UpdateUser(user *models.User) error
 	DeleteUser(id uint) error
 	AddWorkoutToUser(userID uint, workout *models.WorkoutPlan) error
@@ -46,7 +48,30 @@ func (u *userService) DeleteUser(id uint) error {
 
 // GetUser implements UserService.
 func (u *userService) GetUser(id uint) (*models.User, error) {
-	panic("unimplemented")
+	if id == 0 {
+		log.Printf("Invalid ID: %d", id)
+		return nil, fmt.Errorf("invalid ID")
+	}
+
+	var user models.User
+	if err := u.db.First(&user, id).Error; err != nil {
+		log.Printf("Error while finding the user in DB : %s", err.Error())
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (u *userService) GetUserByUsername(username string) (*models.User, error) {
+	if len(username) == 0 {
+		return nil, fmt.Errorf("invalid username")
+	}
+
+	var user models.User
+	if err := u.db.Where("username = ?", username).First(&user).Error; err != nil {
+		log.Printf("Error while finding the user in DB : %s", err.Error())
+		return nil, err
+	}
+	return &user, nil
 }
 
 // GetUserWorkouts implements UserService.
