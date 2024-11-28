@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"workout-tracker/services"
@@ -27,10 +26,10 @@ func GetUser(userService services.UserService) http.HandlerFunc {
 			return
 		}
 
-		if err := json.NewEncoder(w).Encode(user); err != nil {
+		if err := writeSuccessUserResponse(w, http.StatusOK, user); err != nil {
 			writeErrorResponse(w, http.StatusInternalServerError, "Failed to encode user data "+err.Error())
 			return
 		}
-		writeSuccessUserResponse(w, http.StatusOK, user)
+
 	}
 }
