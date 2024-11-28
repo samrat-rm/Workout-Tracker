@@ -4,10 +4,10 @@ import "github.com/jinzhu/gorm"
 
 type User struct {
 	gorm.Model
-	Username       string `gorm:"unique" json:"username"`
-	Password       string `json:"password"`
-	Workouts       []Workout
-	HasWorkoutPlan bool
+	Username       string        `gorm:"unique" json:"username"`
+	Password       string        `json:"password"`
+	Workouts       []WorkoutPlan `json:"workouts"`
+	HasWorkoutPlan bool          `json:"has_workout_plan"`
 }
 
 type Muscle int
@@ -33,13 +33,21 @@ const (
 )
 
 type Exercise struct {
-	Name               string
-	Description        string
-	Category           ExerciseCategory
-	MuscleGroup        []Muscle
-	PrimaryMuscleGroup Muscle
+	Name               string           `json:"name"`
+	Description        string           `json:"description"`
+	Category           ExerciseCategory `json:"category"`
+	MuscleGroup        []Muscle         `json:"muscle_group"`
+	PrimaryMuscleGroup Muscle           `json:"primary_muscle_group"`
 }
 
-type Workout struct {
-	Exercises []Exercise
+type WorkoutPlan struct {
+	Exercises []Exercise `json:"exercises"`
+}
+
+func (m Muscle) String() string {
+	return [...]string{"Chest", "Biceps", "Triceps", "Shoulders", "Delts", "BackMuscles", "ForeArms", "Abs", "Legs"}[m]
+}
+
+func (e ExerciseCategory) String() string {
+	return [...]string{"Cardio", "Strength", "Flexibility"}[e]
 }
