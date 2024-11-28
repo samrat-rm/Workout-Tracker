@@ -15,6 +15,7 @@ type UserService interface {
 	GetUserByUsername(username string) (*models.User, error)
 	UpdateUser(id uint, user *models.User) error
 	DeleteUser(id uint) error
+	AddWorkoutToUser(id uint, workout *models.WorkoutPlan) error
 }
 
 type userService struct {
@@ -23,6 +24,11 @@ type userService struct {
 
 func (u *userService) DeleteUser(id uint) error {
 	var user models.User
+
+	if id == 0 {
+		log.Printf("Invalid ID: %d", id)
+		return fmt.Errorf("invalid ID")
+	}
 
 	if err := u.db.First(&user, id).Error; err != nil {
 		log.Printf("User not found: %s", err.Error())
@@ -38,6 +44,10 @@ func (u *userService) DeleteUser(id uint) error {
 }
 
 func (u *userService) UpdateUser(id uint, user *models.User) error {
+	if id == 0 {
+		log.Printf("Invalid ID: %d", id)
+		return fmt.Errorf("invalid ID")
+	}
 
 	var userInterface models.User
 	if err := u.db.First(userInterface, user.ID).Error; err != nil {

@@ -6,7 +6,7 @@ type User struct {
 	gorm.Model
 	Username       string        `gorm:"unique" json:"username"`
 	Password       string        `json:"password"`
-	WorkoutPlans   []WorkoutPlan `json:"workouts"`
+	WorkoutPlans   []WorkoutPlan `gorm:"foreignkey:UserID;constraint:OnDelete:CASCADE;" json:"workout_plans"` // automatically remove related records when a User or WorkoutPlan is deleted
 	HasWorkoutPlan bool          `json:"has_workout_plan"`
 	ProgressLog    []ProgressLog `json:"progress_log"`
 }
