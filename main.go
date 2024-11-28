@@ -4,8 +4,7 @@ import (
 	"log"
 	"net/http"
 	"workout-tracker/handlers"
-
-	// "workout-tracker/middlewares"
+	"workout-tracker/middlewares"
 	"workout-tracker/services"
 	"workout-tracker/utils"
 
@@ -18,13 +17,17 @@ func main() {
 	router := mux.NewRouter()
 
 	userService := services.NewUserService(db)
+
+	// Public routes
 	router.HandleFunc("/signup", handlers.SignUp(userService)).Methods("POST")
 	router.HandleFunc("/login", handlers.Login(userService)).Methods("POST")
 	router.HandleFunc("/logout", handlers.Logout(userService)).Methods("POST")
 
-	router.HandleFunc("/user/{id}", handlers.GetUser(userService)).Methods("GET")
+	// Protected routes with middleware
+	protectedRoutes := router.PathPrefix("/user").Subrouter()
+	protectedRoutes.Use(middlewares.JwtMiddleware)
+	protectedRoutes.HandleFunc("/{id}", handlers.GetUser(userService)).Methods("GET")
 
-	// router.Use(middlewares.JwtMiddleware)
 	// router.HandleFunc("/user", handlers.UpdateUser).Methods("PUT")
 	// router.HandleFunc("/user", handlers.DeleteUser).Methods("DELETE")
 	// router.HandleFunc("/user/workout", handlers.AddWorkoutToUser).Methods("POST")

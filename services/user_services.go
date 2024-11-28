@@ -31,7 +31,7 @@ func (u *userService) AddWorkoutToUser(userID uint, workout *models.WorkoutPlan)
 
 // CreateUser implements UserService.
 func (u *userService) CreateUser(user *models.User) error { // !TODO checkif there is already user present
-	if len(user.Workouts) > 0 {
+	if len(user.WorkoutPlans) > 0 {
 		user.HasWorkoutPlan = true
 	}
 	if err := u.db.Create(&user).Error; err != nil {
