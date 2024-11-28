@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"os"
 	"workout-tracker/models"
 
 	_ "github.com/lib/pq"
@@ -9,19 +10,41 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-var DB *gorm.DB
+type TrackerDB struct {
+	DB *gorm.DB
+}
 
-func InitDB() *gorm.DB {
-	var err error
-	// dsn := os.Getenv("DB_DSN") // Example: "host=localhost user=postgres password=1234 dbname=workout_tracker sslmode=disable"
-	DB, err = gorm.Open("postgres", "user=samrat dbname=workout_tracker sslmode=disable")
-	if err != nil {
-		log.Fatalf("Error connecting to the database: %v", err)
+func InitDB() (*TrackerDB, error) {
+	dsn := os.Getenv("DB_DSN") // Example: "host=localhost user=postgres password=1234 dbname=workout_tracker sslmode=disable"
+	if dsn == "" {
+		log.Println("DB_DSN not set. Using default connection string.")
+		dsn = "user=samrat dbname=workout_tracker sslmode=disable"
 	}
 
-	// Run migrations
-	DB.AutoMigrate(&models.User{}, &models.WorkoutPlan{})
-	log.Println("Database connected and migrated")
+	db, err := gorm.Open("postgres", dsn)
+	if err != nil {
+		return nil, err
+	}
 
-	return DB
+	err = db.AutoMigrate(
+		&models.User{},
+		&models.Exercise{},
+		&models.WorkoutPlan{},
+	).Error
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("Database connected and migrated successfully.")
+
+	return &TrackerDB{DB: db}, nil
+}
+
+func (db *TrackerDB) Close() {
+	err := db.DB.Close()
+	if err != nil {
+		log.Printf("Error closing the database connection: %s", err.Error())
+	} else {
+		log.Println("Database connection closed successfully.")
+	}
 }
