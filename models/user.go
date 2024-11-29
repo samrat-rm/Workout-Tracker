@@ -1,11 +1,15 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
 	gorm.Model
-	Username       string        `gorm:"unique" json:"username"`
-	Password       string        `json:"password"`
+	Username       string        `gorm:"unique" json:"username" validate:"required"`
+	Password       string        `json:"password" validate:"required"`
 	WorkoutPlans   []WorkoutPlan `gorm:"foreignkey:UserID;constraint:OnDelete:CASCADE;" json:"workout_plans"` // automatically remove related records when a User or WorkoutPlan is deleted
 	HasWorkoutPlan bool          `json:"has_workout_plan"`
 	ProgressLog    []ProgressLog `json:"progress_log"`
@@ -44,18 +48,18 @@ const (
 
 type Exercise struct {
 	gorm.Model
-	Name               string           `json:"name"`
-	Description        string           `json:"description"`
-	Category           ExerciseCategory `json:"category"`
-	MuscleGroup        []Muscle         `json:"muscle_group"`
-	PrimaryMuscleGroup Muscle           `json:"primary_muscle_group"`
+	Name               string           `json:"name" validate:"required"`
+	Description        string           `json:"description" validate:"required"`
+	Category           ExerciseCategory `json:"category" validate:"required"`
+	MuscleGroup        []Muscle         `json:"muscle_group" validate:"required"`
+	PrimaryMuscleGroup Muscle           `json:"primary_muscle_group" validate:"required"`
 }
 
 type WorkoutPlan struct {
 	gorm.Model
-	UserID      uint       `json:"user_id"`
-	Description string     `json:"description"`
-	Status      Status     `json:"status"`
+	UserID      uint       `json:"user_id" validate:"required"`
+	Description string     `json:"description" validate:"required"`
+	Status      Status     `json:"status" validate:"required"`
 	Exercises   []Exercise `json:"exercises"`
 }
 
@@ -63,13 +67,13 @@ type WorkoutPlan struct {
 
 type ProgressLog struct {
 	gorm.Model
-	UserID         uint    `json:"user_id"`          // Associate the progress log with a user
-	WorkoutPlanID  uint    `json:"workout_plan_id"`  // Link progress to a specific workout plan
-	Date           string  `json:"date"`             // Log date
-	ExerciseID     uint    `json:"exercise_id"`      // Log progress for a specific exercise
-	Reps           int     `json:"reps"`             // Number of repetitions
-	Sets           int     `json:"sets"`             // Number of sets
-	DurationInMins float64 `json:"duration_in_mins"` // Duration in minutes, for cardio or flexibility exercises
+	UserID         uint      `json:"user_id" validate:"required"`         // Associate the progress log with a user
+	WorkoutPlanID  uint      `json:"workout_plan_id" validate:"required"` // Link progress to a specific workout plan
+	Date           time.Time `json:"date" validate:"required"`            // Log date
+	ExerciseID     uint      `json:"exercise_id" validate:"required"`     // Log progress for a specific exercise
+	Reps           int       `json:"reps"`                                // Number of repetitions
+	Sets           int       `json:"sets" validate:"required"`            // Number of sets
+	DurationInMins float64   `json:"duration_in_mins"`                    // Duration in minutes, for cardio or flexibility exercises
 }
 
 func (m Muscle) String() string {
