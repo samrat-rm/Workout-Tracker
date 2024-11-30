@@ -37,7 +37,12 @@ func (u *userService) CreateUser(user *models.User) error {
 }
 
 func (u *userService) GetUser(id uint) (*models.User, error) {
-	return u.findUserByID(id)
+	var user models.User
+	// Use Preload to load associated WorkoutPlans
+	if err := u.db.Preload("WorkoutPlans").First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (u *userService) GetUserByUsername(username string) (*models.User, error) {

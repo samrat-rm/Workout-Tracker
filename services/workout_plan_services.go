@@ -1,13 +1,14 @@
 package services
 
 import (
+	"fmt"
 	"workout-tracker/models"
 
 	"github.com/jinzhu/gorm"
 )
 
 type WorkoutPlanService interface {
-	AddWorkoutPlanToUser(userID uint, workoutPlan *models.WorkoutPlan) error
+	CreateWorkoutPlanForUser(userID uint, workoutPlan *models.WorkoutPlan) error
 	UpdateWorkoutPlanforUser(userID uint, updatedWorkoutPlan *models.WorkoutPlan) error
 	UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint) error
 	RemoveWorkoutPlanForUser(userID uint, workoutPlanID uint) error
@@ -19,9 +20,31 @@ type workoutPlanService struct {
 	db *gorm.DB
 }
 
-// AddWorkoutPlanToUser implements WorkoutPlanService.
-func (w *workoutPlanService) AddWorkoutPlanToUser(userID uint, workoutPlan *models.WorkoutPlan) error {
-	panic("unimplemented")
+func (w *workoutPlanService) CreateWorkoutPlanForUser(userID uint, workoutPlan *models.WorkoutPlan) error {
+	var user models.User
+	if err := w.db.First(&user, userID).Error; err != nil {
+		fmt.Printf("Error User not found: %v\n", err)
+		return err
+	}
+
+	workoutPlan.UserID = userID
+	if err := w.db.Create(&workoutPlan).Error; err != nil {
+		fmt.Printf("Error while creating workout plan: %v\n", err)
+		return err
+	}
+
+	if err := w.db.Model(&user).Association("WorkoutPlans").Append(workoutPlan).Error; err != nil {
+		fmt.Printf("Error while associating workout plan: %v\n", err)
+		return err
+	}
+
+	user.HasWorkoutPlan = true
+	if err := w.db.Save(&user).Error; err != nil {
+		fmt.Printf("Error while saving workout plan: %v\n", err)
+		return err
+	}
+
+	return nil
 }
 
 // GetAllWorkoutPlansForUser implements WorkoutPlanService.

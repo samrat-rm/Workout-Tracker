@@ -21,9 +21,11 @@ func main() {
 	router := mux.NewRouter()
 
 	userService := services.NewUserService(trackerDB.DB)
+	workoutService := services.NewWorkoutPlanService(trackerDB.DB)
 
 	authHandler := handlers.NewAuthHandler(userService)
 	userHandler := handlers.NewUserHandler(userService)
+	workoutPlanHandler := handlers.NewWokoutSericeHandler(workoutService, userService)
 
 	// Public routes
 	router.HandleFunc("/signup", authHandler.SignUp).Methods("POST")
@@ -36,6 +38,10 @@ func main() {
 	userRouter.HandleFunc("/{id}", userHandler.GetUser).Methods("GET")
 	userRouter.HandleFunc("/{id}", userHandler.DeleteUser).Methods("DELETE")
 	userRouter.HandleFunc("/{id}", userHandler.UpdateUser).Methods("POST")
+
+	workoutPlanRouter := router.PathPrefix("/workout_plan").Subrouter()
+	workoutPlanRouter.Use(middlewares.JwtMiddleware)
+	workoutPlanRouter.HandleFunc("/{id}", workoutPlanHandler.CreateWorkoutPlanForUser).Methods("POST")
 
 	log.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", router)
