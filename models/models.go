@@ -16,35 +16,12 @@ type User struct {
 	ProgressLog    []ProgressLog `gorm:"foreignkey:UserID" json:"progress_log"` // Foreign Key relationship with ProgressLog
 }
 
-type Muscle int
-
-const (
-	Chest Muscle = iota
-	Biceps
-	Triceps
-	Shoulders
-	Delts
-	BackMuscles
-	ForeArms
-	Abs
-	Legs
-)
-
 type ExerciseCategory int
 
 const (
 	Cardio ExerciseCategory = iota
 	Strength
 	Flexibility
-)
-
-type Status int
-
-const (
-	NotStarted Status = iota
-	InProgress
-	Completed
-	Quit
 )
 
 type Exercise struct {
@@ -73,10 +50,6 @@ type ProgressLog struct {
 	Reps           int       `json:"reps"`                                // Number of repetitions
 	Sets           int       `json:"sets" validate:"required"`            // Number of sets
 	DurationInMins float64   `json:"duration_in_mins"`                    // Duration in minutes, for cardio or flexibility exercises
-}
-
-func (m Muscle) String() string {
-	return [...]string{"Chest", "Biceps", "Triceps", "Shoulders", "Delts", "BackMuscles", "ForeArms", "Abs", "Legs"}[m]
 }
 
 func (e ExerciseCategory) String() string {
