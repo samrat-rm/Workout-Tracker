@@ -11,7 +11,6 @@ type UserHandler interface {
 	GetUser(w http.ResponseWriter, req *http.Request)
 	DeleteUser(w http.ResponseWriter, req *http.Request)
 	UpdateUser(w http.ResponseWriter, req *http.Request)
-	AddWorkoutToUser(w http.ResponseWriter, req *http.Request)
 }
 
 type userHandler struct {
@@ -49,7 +48,7 @@ func (h *userHandler) DeleteUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	utils.WriteSuccessResponse(w, http.StatusNoContent, "User deleted successfully", &userId, nil)
+	utils.WriteSuccessResponse(w, http.StatusOK, "User deleted successfully", &userId, nil)
 }
 
 func (h *userHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
@@ -72,27 +71,5 @@ func (h *userHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	utils.WriteSuccessResponse(w, http.StatusOK, "User Updated successfully", &userId, nil)
-
-}
-
-func (h *userHandler) AddWorkoutToUser(w http.ResponseWriter, req *http.Request) {
-	userID, err := fetchUserID(req)
-	if err != nil {
-		utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, ", err)
-		return
-	}
-
-	var workoutPlan models.WorkoutPlan
-	if err := decodeRequestBody(req, &workoutPlan); err != nil {
-		utils.WriteErrorResponse(w, http.StatusBadRequest, "WorkoutPlan data in req body id invalid, Please provide a valid workoutPlan data, ", err)
-		return
-	}
-
-	err = h.userService.AddWorkoutToUser(userID, &workoutPlan)
-	if err != nil {
-		utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while creating workoutPlan for user, ", err)
-		return
-	}
-	utils.WriteSuccessResponse(w, http.StatusCreated, "Workout plan created successfully", &userID, nil)
 
 }

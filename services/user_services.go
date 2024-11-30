@@ -14,7 +14,6 @@ type UserService interface {
 	GetUserByUsername(username string) (*models.User, error)
 	UpdateUser(id uint, user *models.User) error
 	DeleteUser(id uint) error
-	AddWorkoutToUser(id uint, workout *models.WorkoutPlan) error
 	findUserByID(id uint) (*models.User, error)
 }
 
@@ -73,24 +72,9 @@ func (u *userService) DeleteUser(id uint) error {
 		return err
 	}
 
-	if err := u.db.Delete(&user).Error; err != nil {
+	if err := u.db.Unscoped().Delete(&user, user.ID).Error; err != nil {
 		log.Printf("Error while deleting user in DB: %s", err.Error())
 		return err
-	}
-
-	return nil
-}
-
-func (u *userService) AddWorkoutToUser(id uint, workoutPlan *models.WorkoutPlan) error {
-	user, err := u.findUserByID(id)
-	if err != nil {
-		log.Printf("Error user not found : %s", err.Error())
-		return err
-	}
-
-	if err := u.db.Model(user).Association("WorkoutPlans").Append(workoutPlan).Error; err != nil {
-		log.Printf("Error adding workout to user: %s", err.Error())
-		return fmt.Errorf("failed to add workout to user")
 	}
 
 	return nil
