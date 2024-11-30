@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"workout-tracker/models"
 	"workout-tracker/services"
@@ -12,9 +11,9 @@ import (
 
 func SignUp(userService services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
+
 		var user models.User
-		err := json.NewDecoder(req.Body).Decode(&user)
-		if err != nil || !utils.ValidateUserCredentials(&user) {
+		if err := decodeRequestBody(req, user); err != nil || !utils.ValidateUserCredentials(&user) {
 			msg := "Invalid credentials, Failed to Sign up"
 			if err != nil {
 				msg += ", " + err.Error()
@@ -42,10 +41,9 @@ func SignUp(userService services.UserService) http.HandlerFunc {
 
 func Login(userService services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		var credentials models.User
-		err := json.NewDecoder(req.Body).Decode(&credentials)
 
-		if err != nil || !utils.ValidateUserCredentials(&credentials) {
+		var credentials models.User
+		if err := decodeRequestBody(req, credentials); err != nil || !utils.ValidateUserCredentials(&credentials) {
 			msg := "Invalid credentials, Failed to login"
 			if err != nil {
 				msg += ", " + err.Error()
