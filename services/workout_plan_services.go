@@ -13,7 +13,7 @@ type WorkoutPlanService interface {
 	UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint) error
 	RemoveWorkoutPlanForUser(userID uint, workoutPlanID uint) error
 	GetAllWorkoutPlansForUser(userID uint) ([]models.WorkoutPlan, error)
-	GetWorkoutPlanForUser(userID uint, workoutPlanID uint) error
+	GetWorkoutPlanForUser(userID uint, workoutPlanID uint) (models.WorkoutPlan, error)
 }
 
 type workoutPlanService struct {
@@ -59,9 +59,13 @@ func (w *workoutPlanService) GetAllWorkoutPlansForUser(userID uint) ([]models.Wo
 	return workoutPlans, nil
 }
 
-// GetWorkoutPlanForUser implements WorkoutPlanService.
-func (w *workoutPlanService) GetWorkoutPlanForUser(userID uint, workoutPlanID uint) error {
-	panic("unimplemented")
+func (w *workoutPlanService) GetWorkoutPlanForUser(userID uint, workoutPlanID uint) (models.WorkoutPlan, error) {
+	var workoutPlan models.WorkoutPlan
+	if err := w.db.Preload("Exercises").
+		Where("user_id = ? AND id = ?", userID, workoutPlanID).First(&workoutPlan).Error; err != nil {
+		return workoutPlan, err
+	}
+	return workoutPlan, nil
 }
 
 // RemoveWorkoutPlanForUser implements WorkoutPlanService.

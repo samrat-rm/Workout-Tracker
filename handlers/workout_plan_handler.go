@@ -10,6 +10,7 @@ import (
 type WorkoutPlan interface {
 	CreateWorkoutPlanForUser(w http.ResponseWriter, req *http.Request)
 	GetAllWorkoutPlansForUser(w http.ResponseWriter, req *http.Request)
+	GetWorkoutPlanForUser(w http.ResponseWriter, req *http.Request)
 }
 
 type workoutPlan struct {
@@ -59,4 +60,26 @@ func (wp *workoutPlan) GetAllWorkoutPlansForUser(w http.ResponseWriter, req *htt
 	}
 
 	utils.WriteSuccessResponseWithBody(w, http.StatusOK, workoutPlans)
+}
+
+func (wp *workoutPlan) GetWorkoutPlanForUser(w http.ResponseWriter, req *http.Request) {
+	userID, err := fetchUserID(req)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusBadRequest, "user ID invalid, Please provide a valid user ID, ", err)
+		return
+	}
+
+	wpID, err := fetchWorkoutPlanID(req)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusBadRequest, "ID invalid, Please provide a valid workout plan ID, ", err)
+		return
+	}
+
+	workoutPlan, err := wp.workoutPlan.GetWorkoutPlanForUser(userID, wpID)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusNotFound, "Error while finding workout plans, ", err)
+		return
+	}
+
+	utils.WriteSuccessResponseWithBody(w, http.StatusOK, workoutPlan)
 }

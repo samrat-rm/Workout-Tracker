@@ -24,3 +24,15 @@ func fetchUserID(req *http.Request) (uint, error) {
 	}
 	return uint(userId), nil
 }
+
+func fetchWorkoutPlanID(req *http.Request) (uint, error) {
+	vars := mux.Vars(req)
+	id := vars["wp_id"]
+	userId, err := strconv.Atoi(id)
+
+	if err != nil {
+		fmt.Printf("Error while converting userId to uint %s", id)
+		return 0, err
+	}
+	return uint(userId), nil
+}
