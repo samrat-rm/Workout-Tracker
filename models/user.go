@@ -4,15 +4,16 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 type User struct {
 	gorm.Model
 	Username       string        `gorm:"unique" json:"username" validate:"required"`
 	Password       string        `json:"password" validate:"required"`
-	WorkoutPlans   []WorkoutPlan `gorm:"foreignkey:UserID;constraint:OnDelete:CASCADE;" json:"workout_plans"` // automatically remove related records when a User or WorkoutPlan is deleted
+	WorkoutPlans   []WorkoutPlan `gorm:"foreignkey:UserID;constraint:OnDelete:CASCADE;" json:"workout_plans"` // Foreign Key relationship with WorkoutPlan
 	HasWorkoutPlan bool          `json:"has_workout_plan"`
-	ProgressLog    []ProgressLog `json:"progress_log"`
+	ProgressLog    []ProgressLog `gorm:"foreignkey:UserID" json:"progress_log"` // Foreign Key relationship with ProgressLog
 }
 
 type Muscle int
@@ -51,7 +52,7 @@ type Exercise struct {
 	Name               string           `json:"name" validate:"required"`
 	Description        string           `json:"description" validate:"required"`
 	Category           ExerciseCategory `json:"category" validate:"required"`
-	MuscleGroup        []Muscle         `json:"muscle_group" validate:"required"`
+	MuscleGroup        pq.Int64Array    `gorm:"type:int[]" json:"muscle_group"` // Using pq.Int64Array to handle PostgreSQL int[] for MuscleGroup
 	PrimaryMuscleGroup Muscle           `json:"primary_muscle_group" validate:"required"`
 }
 
@@ -60,10 +61,8 @@ type WorkoutPlan struct {
 	UserID      uint       `json:"user_id" validate:"required"`
 	Description string     `json:"description" validate:"required"`
 	Status      Status     `json:"status" validate:"required"`
-	Exercises   []Exercise `json:"exercises"`
+	Exercises   []Exercise `gorm:"foreignkey:WorkoutPlanID" json:"exercises"` // Foreign key relationship with Exercise
 }
-
-// TODO Add start and end date for workouts
 
 type ProgressLog struct {
 	gorm.Model
