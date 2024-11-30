@@ -26,11 +26,7 @@ func GetUser(userService services.UserService) http.HandlerFunc {
 			return
 		}
 
-		if err := utils.WriteSuccessUserResponse(w, http.StatusOK, user); err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Failed to encode user data "+err.Error())
-			return
-		}
-
+		utils.WriteSuccessUserResponse(w, http.StatusOK, user)
 	}
 }
 
@@ -48,7 +44,7 @@ func DeleteUser(userService services.UserService) http.HandlerFunc {
 			return
 		}
 
-		utils.WriteSuccessResponse(w, http.StatusNoContent, "User deleted successfully", userId, "")
+		utils.WriteSuccessResponse(w, http.StatusNoContent, "User deleted successfully", &userId, nil)
 	}
 }
 
@@ -73,7 +69,7 @@ func UpdateUser(userService services.UserService) http.HandlerFunc {
 			return
 		}
 
-		utils.WriteSuccessResponse(w, http.StatusOK, "User Updated successfully", userId, "")
+		utils.WriteSuccessResponse(w, http.StatusOK, "User Updated successfully", &userId, nil)
 	}
 }
 
@@ -97,7 +93,7 @@ func AddWorkoutToUser(userService services.UserService) http.HandlerFunc {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while creating workoutPlan for user, "+err.Error())
 			return
 		}
-		utils.WriteSuccessResponse(w, http.StatusCreated, "Workout plan created successfully", userID, "")
+		utils.WriteSuccessResponse(w, http.StatusCreated, "Workout plan created successfully", &userID, nil)
 
 	}
 }

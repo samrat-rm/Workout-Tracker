@@ -36,7 +36,7 @@ func SignUp(userService services.UserService) http.HandlerFunc {
 			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while saving user in DB, Failed to create user"+err.Error())
 			return
 		}
-		utils.WriteSuccessResponse(w, http.StatusCreated, "User created successfully", user.ID, "")
+		utils.WriteSuccessResponse(w, http.StatusCreated, "User created successfully", &user.ID, nil)
 	}
 }
 
@@ -72,7 +72,7 @@ func Login(userService services.UserService) http.HandlerFunc {
 			return
 		}
 
-		utils.WriteSuccessResponse(w, http.StatusOK, "Successfully Logged In", 0, token)
+		utils.WriteSuccessResponse(w, http.StatusOK, "Successfully Logged In", nil, &token)
 	}
 }
 
@@ -81,6 +81,6 @@ func Logout(userService services.UserService) http.HandlerFunc {
 		// To log out, we just need to send a success response and have the client remove the token.
 		// Assuming the client will delete the JWT from local storage or cookies on the front-end.
 
-		utils.WriteSuccessResponse(w, http.StatusOK, "Successfully Logged Out", 0, "")
+		utils.WriteSuccessResponse(w, http.StatusOK, "Successfully Logged Out", nil, nil)
 	}
 }

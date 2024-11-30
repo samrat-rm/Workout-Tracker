@@ -17,26 +17,33 @@ func WriteErrorResponse(w http.ResponseWriter, statusCode int, message string) {
 	})
 }
 
-func WriteSuccessResponse(w http.ResponseWriter, statusCode int, message string, userID uint, token string) {
-	log.Println(message)
+func WriteSuccessResponse(w http.ResponseWriter, statusCode int, message string, userID *uint, token *string) {
+	response := make(map[string]interface{})
+	response["message"] = message
+
+	if userID != nil {
+		response["id"] = fmt.Sprintf("%d", *userID)
+	}
+
+	if token != nil {
+		response["token"] = *token
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	if userID != 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": message,
-			"id":      fmt.Sprintf("%d", userID),
-		})
-	} else {
-		json.NewEncoder(w).Encode(map[string]string{
-			"token":   token,
-			"message": message,
-		})
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding success response: %v", err)
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
 
-func WriteSuccessUserResponse(w http.ResponseWriter, statusCode int, user *models.User) error {
-
+func WriteSuccessUserResponse(w http.ResponseWriter, statusCode int, user *models.User) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	return json.NewEncoder(w).Encode(user)
+
+	if err := json.NewEncoder(w).Encode(user); err != nil {
+		log.Printf("Error encoding user response: %v", err)
+		http.Error(w, "Failed to encode user response", http.StatusInternalServerError)
+	}
 }
