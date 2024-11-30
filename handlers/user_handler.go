@@ -60,7 +60,7 @@ func (h *userHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var user models.User
-	if err := decodeRequestBody(req, user); err != nil {
+	if err := decodeRequestBody(req, &user); err != nil {
 		utils.WriteErrorResponse(w, http.StatusBadRequest, "User data in req body id invalid, Please provide a valid user data, ", err)
 		return
 	}
@@ -83,7 +83,7 @@ func (h *userHandler) AddWorkoutToUser(w http.ResponseWriter, req *http.Request)
 	}
 
 	var workoutPlan models.WorkoutPlan
-	if err := decodeRequestBody(req, workoutPlan); err != nil {
+	if err := decodeRequestBody(req, &workoutPlan); err != nil {
 		utils.WriteErrorResponse(w, http.StatusBadRequest, "WorkoutPlan data in req body id invalid, Please provide a valid workoutPlan data, ", err)
 		return
 	}
