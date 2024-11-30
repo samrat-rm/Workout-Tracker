@@ -29,10 +29,10 @@ type Exercise struct {
 	Name               string           `json:"name" validate:"required"`
 	Description        string           `json:"description" validate:"required"`
 	Category           ExerciseCategory `json:"category" validate:"required"`
-	MuscleGroup        pq.Int64Array    `gorm:"type:int[]" json:"muscle_group"` // Using pq.Int64Array to handle PostgreSQL int[] for MuscleGroup
+	MuscleGroup        pq.Int64Array    `gorm:"type:int[]" json:"muscle_group"`
 	PrimaryMuscleGroup Muscle           `json:"primary_muscle_group" validate:"required"`
+	WorkoutPlanID      uint             `json:"workout_plan_id"` // Foreign key reference to WorkoutPlan
 }
-
 type WorkoutPlan struct {
 	gorm.Model
 	UserID      uint       `json:"user_id" validate:"required"`

@@ -39,7 +39,7 @@ func (u *userService) CreateUser(user *models.User) error {
 func (u *userService) GetUser(id uint) (*models.User, error) {
 	var user models.User
 	// Use Preload to load associated WorkoutPlans
-	if err := u.db.Preload("WorkoutPlans").First(&user, id).Error; err != nil {
+	if err := u.db.Preload("WorkoutPlans.Exercises").First(&user, id).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
