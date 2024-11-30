@@ -9,8 +9,8 @@ import (
 
 type WorkoutPlanService interface {
 	CreateWorkoutPlanForUser(userID uint, workoutPlan *models.WorkoutPlan) error
-	UpdateWorkoutPlanforUser(userID uint, updatedWorkoutPlan *models.WorkoutPlan) error
-	UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint) error
+	UpdateWorkoutPlanforUser(userID uint, workoutPlanID uint, updatedWorkoutPlan *models.WorkoutPlan) error
+	UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint, status models.Status) error
 	RemoveWorkoutPlanForUser(userID uint, workoutPlanID uint) error
 	GetAllWorkoutPlansForUser(userID uint) ([]models.WorkoutPlan, error)
 	GetWorkoutPlanForUser(userID uint, workoutPlanID uint) (models.WorkoutPlan, error)
@@ -68,17 +68,55 @@ func (w *workoutPlanService) GetWorkoutPlanForUser(userID uint, workoutPlanID ui
 	return workoutPlan, nil
 }
 
-// RemoveWorkoutPlanForUser implements WorkoutPlanService.
 func (w *workoutPlanService) RemoveWorkoutPlanForUser(userID uint, workoutPlanID uint) error {
-	panic("unimplemented")
+	var workoutPlan models.WorkoutPlan
+	if err := w.db.Where("user_id = ? AND id = ?", userID, workoutPlanID).First(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	if err := w.db.Delete(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	var user models.User
+	if err := w.db.First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	user.HasWorkoutPlan = false
+	if err := w.db.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// UpdateWorkoutPlanStatusForUser implements WorkoutPlanService.
-func (w *workoutPlanService) UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint) error {
-	panic("unimplemented")
+func (w *workoutPlanService) UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint, status models.Status) error {
+	var workoutPlan models.WorkoutPlan
+	if err := w.db.Where("user_id = ? AND id = ?", userID, workoutPlanID).First(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	workoutPlan.Status = status
+	if err := w.db.Save(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// UpdateWorkoutPlanforUser implements WorkoutPlanService.
-func (w *workoutPlanService) UpdateWorkoutPlanforUser(userID uint, updatedWorkoutPlan *models.WorkoutPlan) error {
-	panic("unimplemented")
+func (w *workoutPlanService) UpdateWorkoutPlanforUser(userID uint, workoutPlanID uint, updatedWorkoutPlan *models.WorkoutPlan) error {
+	var workoutPlan models.WorkoutPlan
+	if err := w.db.Where("user_id = ? AND id = ?", userID, workoutPlanID).First(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	workoutPlan.Description = updatedWorkoutPlan.Description
+	workoutPlan.Exercises = updatedWorkoutPlan.Exercises
+
+	if err := w.db.Save(&workoutPlan).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

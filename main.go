@@ -25,7 +25,7 @@ func main() {
 
 	authHandler := handlers.NewAuthHandler(userService)
 	userHandler := handlers.NewUserHandler(userService)
-	workoutPlanHandler := handlers.NewWokoutSericeHandler(workoutService, userService)
+	workoutPlanHandler := handlers.NewWorkoutServiceHandler(workoutService, userService)
 
 	// Public routes
 	router.HandleFunc("/signup", authHandler.SignUp).Methods("POST")
@@ -41,6 +41,9 @@ func main() {
 
 	userRouter.HandleFunc("/{id}/workout_plan", workoutPlanHandler.GetAllWorkoutPlansForUser).Methods("GET") // /user/{id}/workout_plan
 	userRouter.HandleFunc("/{id}/workout_plan/{wp_id}", workoutPlanHandler.GetWorkoutPlanForUser).Methods("GET")
+	userRouter.HandleFunc("/{id}/workout_plan/{wp_id}", workoutPlanHandler.UpdateWorkoutPlanForUser).Methods("POST")
+	userRouter.HandleFunc("/{id}/workout_plan/{wp_id}", workoutPlanHandler.RemoveWorkoutPlanForUser).Methods("DELETE")
+	userRouter.HandleFunc("/{id}/workout_plan/{wp_id}/status", workoutPlanHandler.UpdateWorkoutPlanStatusForUser).Methods("POST")
 
 	workoutPlanRouter := router.PathPrefix("/workout_plan").Subrouter()
 	workoutPlanRouter.Use(middlewares.JwtMiddleware)
