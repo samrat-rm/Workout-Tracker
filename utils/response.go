@@ -8,7 +8,10 @@ import (
 	"workout-tracker/models"
 )
 
-func WriteErrorResponse(w http.ResponseWriter, statusCode int, message string) {
+func WriteErrorResponse(w http.ResponseWriter, statusCode int, message string, err error) {
+	if err != nil {
+		message = fmt.Sprintf("%s: %s", message, err.Error())
+	}
 	log.Println(message)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)

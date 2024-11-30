@@ -19,13 +19,13 @@ func SignUp(userService services.UserService) http.HandlerFunc {
 			if err != nil {
 				msg += ", " + err.Error()
 			}
-			utils.WriteErrorResponse(w, http.StatusBadRequest, msg)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, msg, err)
 			return
 		}
 
 		hashedPassword, err := utils.HashPasssword(user.Password)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Invalid Password, Failed to create user"+err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Invalid Password, Failed to create user", err)
 			return
 		}
 
@@ -33,7 +33,7 @@ func SignUp(userService services.UserService) http.HandlerFunc {
 		err = userService.CreateUser(&user)
 
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while saving user in DB, Failed to create user"+err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while saving user in DB, Failed to create user", err)
 			return
 		}
 		utils.WriteSuccessResponse(w, http.StatusCreated, "User created successfully", &user.ID, nil)
@@ -50,25 +50,25 @@ func Login(userService services.UserService) http.HandlerFunc {
 			if err != nil {
 				msg += ", " + err.Error()
 			}
-			utils.WriteErrorResponse(w, http.StatusBadRequest, msg)
+			utils.WriteErrorResponse(w, http.StatusBadRequest, msg, err)
 			return
 		}
 
 		user, err := userService.GetUserByUsername(credentials.Username)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, Failed to login, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, Failed to login, ", err)
 			return
 		}
 
 		if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)) != nil {
-			utils.WriteErrorResponse(w, http.StatusUnauthorized, "Invalid credentials, Incorrect Password ")
+			utils.WriteErrorResponse(w, http.StatusUnauthorized, "Invalid credentials, Incorrect Password ", err)
 			return
 		}
 
 		token, err := utils.GenerateToken(user.ID)
 
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "failed to generate token"+err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, "failed to generate token", err)
 			return
 		}
 

@@ -17,12 +17,12 @@ func GetUser(userService services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		userId, err := fetchUserID(req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, ", err)
 			return
 		}
 		user, err := userService.GetUser(userId)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, ", err)
 			return
 		}
 
@@ -35,12 +35,12 @@ func DeleteUser(userService services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		userId, err := fetchUserID(req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, ", err)
 			return
 		}
 		err = userService.DeleteUser(uint(userId))
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, ", err)
 			return
 		}
 
@@ -54,18 +54,18 @@ func UpdateUser(userService services.UserService) http.HandlerFunc {
 		var user models.User
 		userId, err := fetchUserID(req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, ", err)
 			return
 		}
 
 		if err = json.NewDecoder(req.Body).Decode(&user); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "User data in req body id invalid, Please provide a valid user data, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "User data in req body id invalid, Please provide a valid user data, ", err)
 			return
 		}
 
 		err = userService.UpdateUser(uint(userId), &user)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusNotFound, "User not found, ", err)
 			return
 		}
 
@@ -79,18 +79,18 @@ func AddWorkoutToUser(userService services.UserService) http.HandlerFunc {
 		var workoutPlan models.WorkoutPlan
 		userID, err := fetchUserID(req)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "User ID invalid, Please provide a valid user ID, ", err)
 			return
 		}
 
 		if err = json.NewDecoder(req.Body).Decode(&workoutPlan); err != nil {
-			utils.WriteErrorResponse(w, http.StatusBadRequest, "WorkoutPlan data in req body id invalid, Please provide a valid workoutPlan data, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusBadRequest, "WorkoutPlan data in req body id invalid, Please provide a valid workoutPlan data, ", err)
 			return
 		}
 
 		err = userService.AddWorkoutToUser(userID, &workoutPlan)
 		if err != nil {
-			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while creating workoutPlan for user, "+err.Error())
+			utils.WriteErrorResponse(w, http.StatusInternalServerError, "Error while creating workoutPlan for user, ", err)
 			return
 		}
 		utils.WriteSuccessResponse(w, http.StatusCreated, "Workout plan created successfully", &userID, nil)
