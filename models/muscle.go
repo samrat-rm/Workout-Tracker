@@ -15,12 +15,12 @@ const (
 	Delts
 	BackMuscles
 	ForeArms
-	Abs
+	Core
 	Legs
 )
 
 func (m Muscle) String() string {
-	return [...]string{"Chest", "Biceps", "Triceps", "Shoulders", "Delts", "BackMuscles", "ForeArms", "Abs", "Legs"}[m]
+	return [...]string{"Chest", "Biceps", "Triceps", "Shoulders", "Delts", "BackMuscles", "ForeArms", "Core", "Legs"}[m]
 }
 
 func (m Muscle) MarshalJSON() ([]byte, error) {
@@ -52,8 +52,8 @@ func (m *Muscle) UnmarshalJSON(data []byte) error {
 		*m = BackMuscles
 	case "ForeArms":
 		*m = ForeArms
-	case "Abs":
-		*m = Abs
+	case "Core":
+		*m = Core
 	case "Legs":
 		*m = Legs
 	default:
