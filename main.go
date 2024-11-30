@@ -22,17 +22,20 @@ func main() {
 
 	userService := services.NewUserService(trackerDB.DB)
 
+	authHandler := handlers.NewAuthHandler(userService)
+	userHandler := handlers.NewUserHandler(userService)
+
 	// Public routes
-	router.HandleFunc("/signup", handlers.SignUp(userService)).Methods("POST")
-	router.HandleFunc("/login", handlers.Login(userService)).Methods("POST")
-	router.HandleFunc("/logout", handlers.Logout(userService)).Methods("POST")
+	router.HandleFunc("/signup", authHandler.SignUp).Methods("POST")
+	router.HandleFunc("/login", authHandler.Login).Methods("POST")
+	router.HandleFunc("/logout", authHandler.Logout).Methods("POST")
 
 	// Auth Middleware routes
 	userRouter := router.PathPrefix("/user").Subrouter()
 	userRouter.Use(middlewares.JwtMiddleware)
-	userRouter.HandleFunc("/{id}", handlers.GetUser(userService)).Methods("GET")
-	userRouter.HandleFunc("/{id}", handlers.DeleteUser(userService)).Methods("DELETE")
-	userRouter.HandleFunc("/{id}", handlers.UpdateUser(userService)).Methods("POST")
+	userRouter.HandleFunc("/{id}", userHandler.GetUser).Methods("GET")
+	userRouter.HandleFunc("/{id}", userHandler.DeleteUser).Methods("DELETE")
+	userRouter.HandleFunc("/{id}", userHandler.UpdateUser).Methods("POST")
 
 	log.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", router)
