@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"workout-tracker/models"
 )
 
 func WriteErrorResponse(w http.ResponseWriter, statusCode int, message string, err error) {
@@ -41,11 +40,11 @@ func WriteSuccessResponse(w http.ResponseWriter, statusCode int, message string,
 	}
 }
 
-func WriteSuccessUserResponse(w http.ResponseWriter, statusCode int, user *models.User) {
+func WriteSuccessResponseWithBody(w http.ResponseWriter, statusCode int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	if err := json.NewEncoder(w).Encode(user); err != nil {
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		log.Printf("Error encoding user response: %v", err)
 		http.Error(w, "Failed to encode user response", http.StatusInternalServerError)
 	}

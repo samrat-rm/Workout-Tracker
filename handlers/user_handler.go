@@ -33,7 +33,7 @@ func (h *userHandler) GetUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	utils.WriteSuccessUserResponse(w, http.StatusOK, user)
+	utils.WriteSuccessResponseWithBody(w, http.StatusOK, user)
 }
 
 func (h *userHandler) DeleteUser(w http.ResponseWriter, req *http.Request) {
