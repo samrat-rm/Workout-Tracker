@@ -49,7 +49,6 @@ func (h *authHandler) SignUp(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	utils.WriteSuccessResponse(w, http.StatusCreated, "User created successfully", &user.ID, nil)
-
 }
 
 func (h *authHandler) Login(w http.ResponseWriter, req *http.Request) {

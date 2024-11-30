@@ -71,5 +71,4 @@ func (h *userHandler) UpdateUser(w http.ResponseWriter, req *http.Request) {
 	}
 
 	utils.WriteSuccessResponse(w, http.StatusOK, "User Updated successfully", &userId, nil)
-
 }
