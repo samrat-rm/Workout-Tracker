@@ -38,6 +38,7 @@ func main() {
 	userRouter.HandleFunc("/{id}", userHandler.GetUser).Methods("GET")
 	userRouter.HandleFunc("/{id}", userHandler.DeleteUser).Methods("DELETE")
 	userRouter.HandleFunc("/{id}", userHandler.UpdateUser).Methods("POST")
+	userRouter.HandleFunc("/{id}/workout_plan", workoutPlanHandler.GetAllWorkoutPlansForUser).Methods("GET") // /user/{id}/workout_plan
 
 	workoutPlanRouter := router.PathPrefix("/workout_plan").Subrouter()
 	workoutPlanRouter.Use(middlewares.JwtMiddleware)

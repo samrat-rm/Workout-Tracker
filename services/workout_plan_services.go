@@ -12,12 +12,16 @@ type WorkoutPlanService interface {
 	UpdateWorkoutPlanforUser(userID uint, updatedWorkoutPlan *models.WorkoutPlan) error
 	UpdateWorkoutPlanStatusForUser(userID uint, workoutPlanID uint) error
 	RemoveWorkoutPlanForUser(userID uint, workoutPlanID uint) error
-	GetAllWorkoutPlansForUser(userID uint) error
+	GetAllWorkoutPlansForUser(userID uint) ([]models.WorkoutPlan, error)
 	GetWorkoutPlanForUser(userID uint, workoutPlanID uint) error
 }
 
 type workoutPlanService struct {
 	db *gorm.DB
+}
+
+func NewWorkoutPlanService(db *gorm.DB) WorkoutPlanService {
+	return &workoutPlanService{db: db}
 }
 
 func (w *workoutPlanService) CreateWorkoutPlanForUser(userID uint, workoutPlan *models.WorkoutPlan) error {
@@ -47,9 +51,12 @@ func (w *workoutPlanService) CreateWorkoutPlanForUser(userID uint, workoutPlan *
 	return nil
 }
 
-// GetAllWorkoutPlansForUser implements WorkoutPlanService.
-func (w *workoutPlanService) GetAllWorkoutPlansForUser(userID uint) error {
-	panic("unimplemented")
+func (w *workoutPlanService) GetAllWorkoutPlansForUser(userID uint) ([]models.WorkoutPlan, error) {
+	var workoutPlans []models.WorkoutPlan
+	if err := w.db.Preload("Exercises").Where("user_id = ?", userID).Find(&workoutPlans).Error; err != nil {
+		return nil, err
+	}
+	return workoutPlans, nil
 }
 
 // GetWorkoutPlanForUser implements WorkoutPlanService.
@@ -70,8 +77,4 @@ func (w *workoutPlanService) UpdateWorkoutPlanStatusForUser(userID uint, workout
 // UpdateWorkoutPlanforUser implements WorkoutPlanService.
 func (w *workoutPlanService) UpdateWorkoutPlanforUser(userID uint, updatedWorkoutPlan *models.WorkoutPlan) error {
 	panic("unimplemented")
-}
-
-func NewWorkoutPlanService(db *gorm.DB) WorkoutPlanService {
-	return &workoutPlanService{db: db}
 }
