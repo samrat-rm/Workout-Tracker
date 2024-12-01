@@ -28,11 +28,23 @@ func fetchUserID(req *http.Request) (uint, error) {
 func fetchWorkoutPlanID(req *http.Request) (uint, error) {
 	vars := mux.Vars(req)
 	id := vars["wp_id"]
-	userId, err := strconv.Atoi(id)
+	wp_id, err := strconv.Atoi(id)
 
 	if err != nil {
-		fmt.Printf("Error while converting userId to uint %s", id)
+		fmt.Printf("Error while converting Workout Plan ID to uint %s", id)
 		return 0, err
 	}
-	return uint(userId), nil
+	return uint(wp_id), nil
+}
+
+func fetchExerciseID(req *http.Request) (uint, error) {
+	vars := mux.Vars(req)
+	id := vars["ex_id"]
+	ex_id, err := strconv.Atoi(id)
+
+	if err != nil {
+		fmt.Printf("Error while converting exercise ID to uint %s", id)
+		return 0, err
+	}
+	return uint(ex_id), nil
 }
